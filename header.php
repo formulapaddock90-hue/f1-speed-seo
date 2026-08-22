@@ -9,18 +9,6 @@
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=GT-5D9JSZL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'GT-5D9JSZL');
-</script>
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1892473664508324" crossorigin="anonymous"></script>
-
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -67,5 +55,5 @@
             );
             ?>
         </nav>
-</div>
-	</header>
+    </div>
+</header>
