@@ -21,9 +21,10 @@ get_header();
                     'page',
                     'gran_premi',
                     'pirelli',
-                    'evergeen',
+                    'evergreen',
                 ),
                 'posts_per_page'      => 1,
+                'post__in'            => 1 === $paged ? array() : array( 0 ),
                 'ignore_sticky_posts' => true,
                 'orderby'             => 'date',
                 'order'               => 'DESC',
@@ -127,7 +128,7 @@ get_header();
                     'page',
                     'gran_premi',
                     'pirelli',
-                    'evergeen',
+                    'evergreen',
                 ),
                 'paged'               => $paged,
                 'posts_per_page'      => get_option( 'posts_per_page' ),
@@ -209,7 +210,7 @@ get_header();
                                     </div>
 
                                     <a class="read-more" href="<?php echo esc_url( $post_url ); ?>">
-                                        <?php esc_html_e( 'Leggi di piu', 'f1-speed-seo' ); ?>
+                                        <?php esc_html_e( 'Leggi di più', 'f1-speed-seo' ); ?>
                                     </a>
                                 </div>
 

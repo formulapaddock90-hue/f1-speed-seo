@@ -3,7 +3,7 @@
  * Template part per la visualizzazione degli articoli correlati per categoria.
  * Ottimizzato per il tema F1 Paddock con supporto immagine in evidenza.
  *
- * @package f1-paddock
+ * @package F1_Speed_SEO
  */
 
 $categories = get_the_category();
@@ -18,7 +18,7 @@ if ( $categories ) :
         'category__in'     => $category_ids,
         'post__not_in'     => array( get_the_ID() ),
         'posts_per_page'   => 3,
-        'ignore_sticky_posts' => 1
+        'ignore_sticky_posts' => true,
     );
 
     $related_query = new WP_Query( $args );
@@ -27,7 +27,7 @@ if ( $categories ) :
         <section class="related-posts">
             <div class="container">
                 <h3 class="related-title mb-4 text-uppercase fw-bold" style="letter-spacing: 2px; border-left: 4px solid var(--f1-red); padding-left: 15px;">
-                    <?php esc_html_e( 'Articoli Simili', 'f1-paddock' ); ?>
+                    <?php esc_html_e( 'Articoli simili', 'f1-speed-seo' ); ?>
                 </h3>
                 
                 <div class="related-grid">
@@ -48,7 +48,7 @@ if ( $categories ) :
                                         <?php the_title(); ?>
                                     </h4>
                                     <time class="text-muted small">
-                                        <?php echo get_the_date(); ?>
+                                        <?php echo esc_html( get_the_date() ); ?>
                                     </time>
                                 </div>
                             </a>

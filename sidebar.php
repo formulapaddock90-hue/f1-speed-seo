@@ -23,7 +23,7 @@ $next_gp = f1_speed_seo_get_next_grand_prix();
             <?php if ( ! empty( $next_gp['next_session'] ) ) : ?>
                 <div class="f1-countdown-box">
                     <div class="cd-header">
-                        <span class="cd-label" id="f1-cd-status-title">⏱️ PROSSIMA SESSIONE: <strong><?php echo esc_html( mb_strtoupper( $next_gp['next_session']['name'] ) ); ?></strong></span>
+                        <span class="cd-label" id="f1-cd-status-title">⏱️ PROSSIMA SESSIONE: <strong><?php echo esc_html( strtoupper( $next_gp['next_session']['name'] ) ); ?></strong></span>
                     </div>
 
                     <div id="f1-countdown-timer" class="f1-countdown-grid" data-timestamp="<?php echo esc_attr( $next_gp['next_session']['timestamp'] ); ?>">
@@ -52,7 +52,7 @@ $next_gp = f1_speed_seo_get_next_grand_prix();
 
             <?php if ( ! empty( $next_gp['sessions'] ) ) : ?>
                 <div class="f1-schedule-list">
-                    <h4 class="schedule-title">📅 Orari Sessioni (GMT+2)</h4>
+                    <h4 class="schedule-title">📅 Orari sessioni (ora italiana)</h4>
                     <ul class="sessions-ul">
                         <?php foreach ( $next_gp['sessions'] as $session ) : 
                             $class = 'session-row';
