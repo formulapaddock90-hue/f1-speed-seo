@@ -65,6 +65,11 @@ function f1_speed_seo_resource_hints( $urls, $relation_type ) {
 
 add_action( 'wp_head', 'f1_speed_seo_meta_tags', 1 );
 function f1_speed_seo_meta_tags() {
+    // Evita meta tag duplicati quando un plugin SEO li gestisce già.
+    if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ) {
+        return;
+    }
+
     if ( is_singular() ) {
         $description = has_excerpt() ? get_the_excerpt() : wp_strip_all_tags( (string) get_post_field( 'post_content', get_the_ID() ) );
         $description = wp_trim_words( $description, 28, '…' );
@@ -76,7 +81,6 @@ function f1_speed_seo_meta_tags() {
         echo '<meta name="description" content="' . esc_attr( $description ) . '">' . "\n";
     }
 
-    echo '<meta name="robots" content="index,follow,max-image-preview:large">' . "\n";
     echo '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '">' . "\n";
     echo '<meta property="og:description" content="' . esc_attr( $description ) . '">' . "\n";
 
@@ -99,7 +103,7 @@ function f1_speed_seo_meta_tags() {
 
 add_action( 'wp_head', 'f1_speed_seo_json_ld', 20 );
 function f1_speed_seo_json_ld() {
-    if ( ! is_single() ) {
+    if ( ! is_single() || defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ) {
         return;
     }
 
@@ -325,7 +329,9 @@ add_action('rest_after_insert_post', 'fp_save_yoast_meta_from_rest', 10, 3);
 add_action('rest_after_insert_page', 'fp_save_yoast_meta_from_rest', 10, 3);
 
 function fp_save_yoast_meta_from_rest($post, $request, $creating) {
-    if (!$post instanceof WP_Post) return;
+    if ( ! $post instanceof WP_Post || ! current_user_can( 'edit_post', $post->ID ) ) {
+        return;
+    }
 
     $meta = $request->get_param('meta');
     if (!is_array($meta)) {
@@ -545,7 +551,7 @@ function f1_speed_seo_get_driver_standings() {
     $standings = get_transient( 'f1_driver_standings' );
     if ( false === $standings ) {
         $response = wp_remote_get( 'https://api.jolpi.ca/ergast/f1/current/driverStandings.json', array( 'timeout' => 5 ) );
-        if ( ! is_wp_error( $response ) ) {
+        if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
             $body = wp_remote_retrieve_body( $response );
             $data = json_decode( $body, true );
             $list = $data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'] ?? array();
@@ -574,7 +580,7 @@ function f1_speed_seo_get_constructor_standings() {
     $standings = get_transient( 'f1_constructor_standings' );
     if ( false === $standings ) {
         $response = wp_remote_get( 'https://api.jolpi.ca/ergast/f1/current/constructorStandings.json', array( 'timeout' => 5 ) );
-        if ( ! is_wp_error( $response ) ) {
+        if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
             $body = wp_remote_retrieve_body( $response );
             $data = json_decode( $body, true );
             $list = $data['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'] ?? array();
@@ -598,8 +604,6 @@ function f1_speed_seo_get_constructor_standings() {
  * Ottiene le informazioni del prossimo GP di F1 e gli orari di tutte le sessioni dall'API Jolpica F1.
  */
 function f1_speed_seo_get_next_grand_prix() {
-    delete_transient( 'f1_next_gp_schedule' );
-    delete_transient( 'f1_next_gp_schedule_v5' );
     $gp_data = get_transient( 'f1_next_gp_schedule_v6' );
 
     // Verifichiamo se i dati in cache sono ancora validi (almeno una sessione non passata)
@@ -612,7 +616,7 @@ function f1_speed_seo_get_next_grand_prix() {
 
     if ( false === $gp_data ) {
         $response = wp_remote_get( 'https://api.jolpi.ca/ergast/f1/current/next.json', array( 'timeout' => 5 ) );
-        if ( ! is_wp_error( $response ) ) {
+        if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
             $body = wp_remote_retrieve_body( $response );
             $data = json_decode( $body, true );
             $race = $data['MRData']['RaceTable']['Races'][0] ?? null;
@@ -663,6 +667,9 @@ function f1_speed_seo_get_next_grand_prix() {
                     $datetime_str = $s['data']['date'] . ' ' . $time_str;
                     
                     $timestamp = strtotime( $datetime_str );
+                    if ( false === $timestamp ) {
+                        continue;
+                    }
                     $dt = new DateTime();
                     $dt->setTimestamp( $timestamp );
                     $dt->setTimezone( $target_tz );
